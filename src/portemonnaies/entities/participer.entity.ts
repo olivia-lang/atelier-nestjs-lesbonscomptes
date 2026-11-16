@@ -3,10 +3,21 @@ import {Portemonnaie} from "./porte-monnaies.entity.js";
 import {Depense} from "../../depenses/depenses.entity.js";
 import {Compte} from "../../comptes/comptes.entity.js";
 
+// TODO : transformer cette classe en entité TypeORM
+// et ajouter le bon décorateur sur chaque champ
 export class Participer {
+    // clé primaire générée automatiquement
+    id: number;
 
-    // TODO
-    // Nous souhaitons avoir un id (primary key), 
-    // une date d'invitation (date), une date d'acceptation (date, null autorisé), 
-    // le portemonnaie associé et le compte qui participe
+    // date (sans l'heure)
+    dateInvitation: Date;
+
+    // date (sans l'heure), vide tant que l'invitation n'est pas acceptée
+    dateAccepte: Date | null;
+
+    // le porte-monnaie associé
+    portemonnaie: Relation<Portemonnaie>;
+
+    // le compte qui participe
+    compte: Relation<Compte>;
 }
