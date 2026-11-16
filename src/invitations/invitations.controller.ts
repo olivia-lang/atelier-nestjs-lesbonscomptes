@@ -8,4 +8,7 @@ export class InvitationsController {
     constructor(private readonly invitationsService: InvitationsService) {}
 
     // TODO
+    // GET /invitations : les invitations reçues et pas encore acceptées
+    // POST /invitations/:id/accepter : accepter une invitation
+    // DELETE /invitations/:id : refuser une invitation, répond avec le code 204
 }

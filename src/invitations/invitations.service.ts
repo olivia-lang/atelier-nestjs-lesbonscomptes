@@ -14,16 +14,20 @@ export class InvitationsService {
         throw new NotImplementedException();
     }
 
+    // met la date du jour dans dateAccepte
     async accepter(id: number, compteId: number): Promise<Participer> {
         // TODO
         throw new NotImplementedException();
     }
 
+    // supprime la ligne
     async refuser(id: number, compteId: number): Promise<void> {
         // TODO
         throw new NotImplementedException();
     }
 
+    // invitation en attente adressée au compte, sinon 404
+    // sert dans accepter et refuser pour ne pas réécrire les vérifications
     private async findInvitation(id: number, compteId: number): Promise<Participer> {
         // TODO
         throw new NotImplementedException();

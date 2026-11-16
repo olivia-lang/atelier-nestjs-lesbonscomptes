@@ -15,7 +15,7 @@ Pour retrouver la syntaxe en cours de route :
 
 ## Ce qu'il faut installer
 
-- Node.js 24 (la version LTS), en 24.11 ou plus récent. Node 22.13 ou plus marche aussi. npm est installé avec Node.
+- Node.js 24 (la version LTS), en 24.15 ou plus récent. Node 22 marche aussi, à partir de la 22.22.3. npm est installé avec Node.
 - Git.
 - Un éditeur de code. On conseille VS Code.
 
@@ -25,7 +25,7 @@ Vérifiez votre version de Node avec cette commande.
 node -v
 ```
 
-Avec une version plus ancienne, npm affiche des avertissements `EBADENGINE` pendant l'installation, parce que TypeORM demande au moins ces versions.
+Avec une version plus ancienne, même une 24 avant la 24.15, npm affiche des avertissements `EBADENGINE` pendant l'installation, parce que certains paquets installés avec Nest et TypeORM demandent au moins ces versions. Le projet marche quand même en général, mais mieux vaut mettre Node à jour.
 
 Le reste (NestJS 12, TypeORM 1.1, React 19, Vite 8) s'installe tout seul avec `npm install`.
 
@@ -74,7 +74,7 @@ Pour l'instant le back ne démarre pas et affiche cette erreur.
 Entity metadata for Compte#participations was not found
 ```
 
-C'est normal, c'est justement l'étape 1. Laissez le terminal ouvert. Avec `start:dev`, le back se relance tout seul à chaque fois que vous enregistrez un fichier.
+C'est normal, c'est justement l'étape 1. Juste avant, Nest écrit aussi `Unable to connect to the database. Retrying...` et réessaie plusieurs fois. Ce n'est pas un problème de connexion ou de `.env`, c'est la même erreur. Laissez le terminal ouvert. Avec `start:dev`, le back se relance tout seul à chaque fois que vous enregistrez un fichier.
 
 ## Comment est rangé le back
 
@@ -118,7 +118,7 @@ Voici les six décorateurs qui manquent, dans le désordre.
 @Column({ type: 'date' })
 ```
 
-Placez-les dans `participer.entity.ts`, au-dessus de la classe et des champs. Les numéros montrent où il en manque un. Les imports en haut du fichier sont déjà bons.
+Placez-les dans `participer.entity.ts`, au-dessus de la classe et des champs. Dans le fichier, les commentaires numérotés de 1 à 6 montrent où il en manque un. Les imports en haut du fichier sont déjà bons.
 
 ```ts
 // 1
@@ -157,14 +157,17 @@ Le formulaire d'inscription envoie `prenom`, `pseudo`, `email` et `motDePasse` s
 
 ### Le DTO
 
-Ouvrez `src/comptes/dto/create-compte.dto.ts`. Le prénom vous est donné en exemple.
+Ouvrez `src/comptes/dto/create-compte.dto.ts`. Le prénom est déjà écrit et sert d'exemple.
 
 ```ts
 export class CreateCompteDto {
     @IsNotEmpty({ message: 'Le prénom est obligatoire' })
     prenom: string;
 
-    // à vous : pseudo, email et motDePasse
+    // TODO
+    // un pseudo (minimum 3 caractères, maximum 30 caractères)
+    // un email
+    // un mot de passe (minimum 8 caractères)
 }
 ```
 
@@ -217,24 +220,25 @@ Inspirez-vous de la route de l'étape 2 et de celles déjà présentes dans ce c
 
 ### Le service
 
-Dans `src/portemonnaies/porte-monnaies.service.ts`, complétez `findAllForCompte` en remplissant les TODO.
+Dans `src/portemonnaies/porte-monnaies.service.ts`, complétez `findAllForCompte`. La méthode est déjà écrite, il reste à remplacer les valeurs marquées TODO1 à TODO4. Elles sont là seulement pour que le projet compile.
 
 ```ts
     async findAllForCompte(compteId: number) {
+        // remplacer les valeurs des TODO, elles sont là pour que le projet compile
         const participations = await this.participationRepository.find({
-            where: // TODO1
-            relations: // TODO2
+            where: {}, // TODO1
+            relations: {}, // TODO2
             order: { portemonnaie: { dateCreation: 'DESC' } },
         });
 
         return participations
-            .filter((p) => /* TODO3 */)
+            .filter((p) => true) // TODO3
             .map((p) => ({
                 id: p.portemonnaie.id,
                 libelle: p.portemonnaie.libelle,
                 status: p.portemonnaie.status,
                 dateCreation: p.portemonnaie.dateCreation,
-                nombreParticipants: // TODO4
+                nombreParticipants: 0, // TODO4
             }));
     }
 ```
@@ -243,6 +247,8 @@ Dans `src/portemonnaies/porte-monnaies.service.ts`, complétez `findAllForCompte
 - TODO2 : charger aussi le porte-monnaie de chaque participation, et les participations de ce porte-monnaie (vous en aurez besoin pour le TODO4).
 - TODO3 : garder seulement les invitations acceptées.
 - TODO4 : compter les participants du porte-monnaie qui ont accepté.
+
+Tant que le TODO2 n'est pas fait, la route renvoie une erreur 500 et le terminal affiche `Cannot read properties of undefined (reading 'id')`.
 
 `participationRepository` est donné au service par son constructeur (`@InjectRepository(Participer)`). Nest le crée tout seul, il n'y a jamais de `new` à écrire.
 
@@ -280,6 +286,7 @@ Questions à se poser :
 
 Ressources utiles :
 
+- le corps est un simple tableau et pas un objet, donc pas besoin de DTO ici. On peut écrire directement `@Body() ids: number[]` ;
 - `removeMember` et `findInvitableMembers`, dans le même controller et le même service, récupèrent déjà un id dans le chemin et vérifient déjà que le compte connecté est membre ;
 - `create`, en haut du service, crée déjà une ligne `participer` ;
 - `exists({ where })` renvoie `true` ou `false` selon qu'une ligne correspond ;
@@ -336,7 +343,7 @@ Demandez à votre voisin de vous inviter, ou invitez-le. Rechargez la page d'acc
 
 Le créateur d'un porte-monnaie voit un bouton "Clôturer" sur sa page, qui appelle `POST /portemonnaies/:id/cloturer`. Une fois le porte-monnaie clos, on ne peut plus ajouter de dépense et la page affiche le solde de chaque participant.
 
-Implémentez la route et la méthode `cloturer` du service. Le front attend le porte-monnaie à jour dans la réponse.
+Implémentez la route et la méthode `cloturer` du service. Le front attend le porte-monnaie à jour dans la réponse, au même format que `GET /portemonnaies/:id`. Sinon la page plante parce qu'il lui manque la liste des participants.
 
 Pour vous aider, vous pouvez vous poser les questions suivantes :
 
@@ -353,6 +360,8 @@ Pour vous aider, vous pouvez vous poser les questions suivantes :
 - La première requête met quelques secondes : la base se met en veille quand personne ne s'en sert, elle se réveille toute seule.
 - Le front affiche `Cannot GET ...` ou `Cannot POST ...` : la route n'existe pas encore. Vérifiez le décorateur, le chemin, et que le controller est bien déclaré dans son module.
 - Le back plante après un enregistrement : lisez le terminal, l'erreur TypeScript donne le fichier et la ligne.
+- Le back affiche `Nest can't resolve dependencies of ...` : il manque quelque chose dans le module. Pour un repository, c'est souvent le `TypeOrmModule.forFeature([...])` qui manque.
+- Une page du front reste blanche ou plante sans message : ouvrez la console du navigateur (F12). Souvent il manque une relation dans le `find` et le front lit un champ qui n'existe pas.
 
 ## Fin de l'atelier
 
