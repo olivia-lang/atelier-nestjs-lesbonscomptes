@@ -1,0 +1,8 @@
+:root {
+  --bs-body-bg: #F0F4EF;
+}
+
+body {
+  margin: 0;
+  background-color: #F0F4EF;
+}
