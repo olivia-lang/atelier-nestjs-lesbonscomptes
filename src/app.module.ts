@@ -25,6 +25,7 @@ import {DepensesModule} from "./depenses/depenses.module.js";
         database: config.get('DB_NAME'),
         entities: [Compte, Portemonnaie, Depense, Participer],
         synchronize: config.get('DB_SYNCHRONIZE') === 'true', // ok en dev, jamais en prod
+        ssl: true, // neon refuse les connexions sans ssl
       }),
     }),
     AuthModule,
