@@ -37,7 +37,22 @@ export class PortemonnaiesService {
     }
 
     async findAllForCompte(compteId: number) {
-        // TODO
+        // remplacer les valeurs des TODO, elles sont là pour que le projet compile
+        const participations = await this.participationRepository.find({
+            where: {}, // TODO1 : les participations du compte connecté
+            relations: {}, // TODO2 : le porte-monnaie de chaque participation, et les participations de ce porte-monnaie
+            order: { portemonnaie: { dateCreation: 'DESC' } },
+        });
+
+        return participations
+            .filter((p) => true) // TODO3 : garder seulement les invitations acceptées
+            .map((p) => ({
+                id: p.portemonnaie.id,
+                libelle: p.portemonnaie.libelle,
+                status: p.portemonnaie.status,
+                dateCreation: p.portemonnaie.dateCreation,
+                nombreParticipants: 0, // TODO4 : compter les participants du porte-monnaie qui ont accepté
+            }));
     }
 
     async findOneForCompte(id: number, compteId: number) {
@@ -69,6 +84,8 @@ export class PortemonnaiesService {
 
     async addMember(walletId: number, accounts: number[], compteId: number) {
         // TODO
+        // seul un participant qui a accepté peut inviter, sinon 404
+        // puis une ligne participer par compte invité, avec dateAccepte vide
     }
 
     async findInvitableMembers(walletId: number, nameOremail: string, compteId: number) {

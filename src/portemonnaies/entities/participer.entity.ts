@@ -5,19 +5,21 @@ import {Compte} from "../../comptes/comptes.entity.js";
 
 // TODO : transformer cette classe en entité TypeORM
 // et ajouter le bon décorateur sur chaque champ
+// les numéros 1 à 6 montrent où il manque un décorateur
+// 1
 export class Participer {
-    // clé primaire générée automatiquement
+    // 2
     id: number;
 
-    // date (sans l'heure)
+    // 3
     dateInvitation: Date;
 
-    // date (sans l'heure), vide tant que l'invitation n'est pas acceptée
+    // 4
     dateAccepte: Date | null;
 
-    // le porte-monnaie associé
+    // 5
     portemonnaie: Relation<Portemonnaie>;
 
-    // le compte qui participe
+    // 6
     compte: Relation<Compte>;
 }

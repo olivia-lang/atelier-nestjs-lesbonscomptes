@@ -30,9 +30,9 @@ export class PortemonnaiesController {
         return this.portemonnaiesService.findInvitableMembers(id,emailOrName,compte.id);
     }
 
-    // TODO : lister tous les portemonnaies d'un compte
+    // TODO : lister tous les portemonnaies d'un compte (GET /portemonnaies, étape 3)
 
-    // TODO : ajouter un participant
+    // TODO : ajouter un participant (POST /portemonnaies/:id/members, étape 4)
 
-    // TODO : clôturer un portemonnaie
+    // TODO : clôturer un portemonnaie (POST /portemonnaies/:id/cloturer, bonus)
 }

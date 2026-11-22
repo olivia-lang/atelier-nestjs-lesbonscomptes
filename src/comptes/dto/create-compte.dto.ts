@@ -1,10 +1,11 @@
-import { ApiPropertyOptional } from '@nestjs/swagger';
-import {IsEmail, IsNotEmpty, Matches, MaxLength, MinLength} from 'class-validator';
+import {IsEmail, IsNotEmpty, MaxLength, MinLength} from 'class-validator';
 
 export class CreateCompteDto {
+    @IsNotEmpty({ message: 'Le prénom est obligatoire' })
+    prenom: string;
+
     // TODO
-    // un pseudo (minimum 3 caractères, maximum 30 cractères) 
-    // un prenom
-    // un email 
+    // un pseudo (minimum 3 caractères, maximum 30 caractères)
+    // un email
     // un mot de passe (minimum 8 caractères)
 }
